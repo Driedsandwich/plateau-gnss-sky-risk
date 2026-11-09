@@ -1,0 +1,40 @@
+# gnss-sky-risk-web
+
+> Static web app that estimates where and when satellite positioning (GPS, QZSS, Galileo, GLONASS, BeiDou) gets worse
+> among buildings in Japanese cities, from PLATEAU 3D building models (LOD1) and satellite orbits (CelesTrak GP, SGP4).
+> Estimate only: box-shaped buildings, no reflections (multipath), no trees, terrain or atmosphere. Not a measurement.
+
+The same calculation is available to AI agents without the screen, through the `gnss-sky-risk` package
+(CLI `sky-risk` and MCP server `sky-risk-mcp`, stdio). Nothing in this app sends user data anywhere; it downloads
+public PLATEAU tiles, GSI map tiles and (only when chosen) CelesTrak orbit data.
+
+## URL (shareable state)
+- `?lat=<deg>&lon=<deg>&t=<ISO 8601 UTC>` point and time; optional `range=<half-side m>` (grid square), `step=<m>`,
+  `r=<candidate radius m>`, `sel=<candidate index>`, `orbits=celestrak`, `city=<5-digit code, default 13104 Shinjuku>`.
+
+## MCP tools (server: `sky-risk-mcp`)
+- `gnss_point` {lat, lon, time?, cityCode?, height?, maskDeg?, systems?}: visible / hidden satellites (azimuth,
+  elevation, blocking building), visibleCount, dop and dopOpenSky (HDOP, PDOP, ...), sky outline (360 azimuths).
+- `gnss_grid` {bbox:[w,s,e,n], times?, stepM?, ...}: GeoJSON points (not under buildings) with visibleCount and hdop per time.
+- `gnss_suggest_spot` {lat, lon, radiusM, time?, stepM?, limit?, ...}: nearby open-air spots with the lowest HDOP.
+
+## CLI examples
+```
+npx sky-risk point --lat 35.6905 --lon 139.6975 --time 2026-11-10T03:00:00Z --gp snapshot
+npx sky-risk suggest --lat 35.6905 --lon 139.6975 --radius 50 --time 2026-11-10T03:00:00Z
+npx sky-risk grid --bbox 139.6950,35.6885,139.7000,35.6925 --time 2026-11-10T03:00:00Z --step 10
+```
+
+## Reading the numbers
+HDOP below about 2 is good, 2-5 fair, above 5 or null (fewer than 4 satellites) means the position may be off by tens
+of metres. Reflections in dense streets make real errors worse than this estimate.
+
+## Limits
+- Grid at most 40000 points per time; keep areas small (500 m x 500 m at 10 m is about 2500 points).
+- Bundled orbit copy is from 2026-11-09; accuracy drops weeks away from it. CelesTrak asks for at most one download per 2 hours.
+- Ground height is estimated from building bases (no terrain model).
+
+## Sources
+- Buildings: 国土交通省 PLATEAU を加工して作成 (https://www.mlit.go.jp/plateau/)
+- Base map: 地理院タイル (https://maps.gsi.go.jp/development/ichiran.html)
+- Orbits: CelesTrak (https://celestrak.org/)

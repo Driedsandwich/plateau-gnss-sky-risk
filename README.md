@@ -26,4 +26,4 @@ AI やエージェント向けの説明は [llms.txt](llms.txt) にあります�
 ## ライセンス
 
 - このアプリ：MIT（[LICENSE](LICENSE)）。
-- 同梱の外の部品：CesiumJS（Apache-2.0）・draco3d（Apache-2.0）・satellite.js（MIT）。許諾の文は [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES/) にあります。
+- 同梱の外の部品：CesiumJS（Apache-2.0）・draco3d（Apache-2.0）・satellite.js（MIT）・字体 Noto Sans JP（SIL Open Font License 1.1）。許諾の文は [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES/) にあります。
